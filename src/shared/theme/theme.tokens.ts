@@ -22,7 +22,7 @@ const lightColors = {
 
 const darkColors = {
   background: "#0F172A",
-  backgroundSecondary: "#4f5a6b",
+  backgroundSecondary: "#425269",
   surface: "#1E293B",
   primary: "#1270b3",
   secondary: "#94A3B8",

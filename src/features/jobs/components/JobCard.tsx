@@ -51,10 +51,12 @@ export const JobCard: React.FC<JobCardProps> = ({
         },
       ]}
     >
-      <Pressable onPress={onPress}>
-        {/* Header: Logo + Title + Company */}
+      {/* SECTION 1: Top area handles the navigation to details */}
+      <Pressable 
+        onPress={onPress}
+        style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+      >
         <View style={styles.header}>
-          {/* Company Logo */}
           <View
             style={[
               styles.logoContainer,
@@ -85,7 +87,6 @@ export const JobCard: React.FC<JobCardProps> = ({
             )}
           </View>
 
-          {/* Title and Company */}
           <View style={styles.titleContainer}>
             <Text
               style={[
@@ -117,9 +118,7 @@ export const JobCard: React.FC<JobCardProps> = ({
           </View>
         </View>
 
-        {/* Location and Work Model Row */}
         <View style={[styles.infoRow, { marginTop: 16 }]}>
-          {/* Location */}
           {job.location && (
             <View style={styles.infoItem}>
               <MapPinIcon size={18} color={tokens.colors.error} />
@@ -129,7 +128,6 @@ export const JobCard: React.FC<JobCardProps> = ({
                   {
                     color: tokens.colors.textSecondary,
                     fontSize: tokens.typography.sizes.md,
-                    fontFamily: tokens.typography.fontFamily.regular,
                   },
                 ]}
                 numberOfLines={1}
@@ -139,7 +137,6 @@ export const JobCard: React.FC<JobCardProps> = ({
             </View>
           )}
 
-          {/* Work Model */}
           {job.workModel && (
             <View style={styles.infoItem}>
               <BriefcaseIcon size={18} color={tokens.colors.text} />
@@ -149,7 +146,6 @@ export const JobCard: React.FC<JobCardProps> = ({
                   {
                     color: tokens.colors.textSecondary,
                     fontSize: tokens.typography.sizes.md,
-                    fontFamily: tokens.typography.fontFamily.regular,
                   },
                 ]}
               >
@@ -159,7 +155,6 @@ export const JobCard: React.FC<JobCardProps> = ({
           )}
         </View>
 
-        {/* Salary Range */}
         {job.salaryRange && job.salaryRange !== "Competitive" && (
           <View style={[styles.salaryRow, { marginTop: 12 }]}>
             <CurrencyDollarIcon size={18} color={tokens.colors.warning} />
@@ -169,7 +164,6 @@ export const JobCard: React.FC<JobCardProps> = ({
                 {
                   color: tokens.colors.textSecondary,
                   fontSize: tokens.typography.sizes.md,
-                  fontFamily: tokens.typography.fontFamily.regular,
                 },
               ]}
             >
@@ -178,162 +172,95 @@ export const JobCard: React.FC<JobCardProps> = ({
           </View>
         )}
 
-        {/* Tags Row (Seniority, Job Type, Category) */}
         <View style={[styles.tagsRow, { marginTop: 16 }]}>
-          {job.seniorityLevel && (
-            <View
-              style={[
-                styles.tag,
-                {
-                  backgroundColor: tokens.colors.tagBackground,
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                },
-              ]}
-            >
-              <Text
+          {[job.seniorityLevel, job.jobType, job.mainCategory].map((tag, index) => (
+            tag && (
+              <View
+                key={index}
                 style={[
-                  styles.tagText,
+                  styles.tag,
                   {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.sm,
-                    fontFamily: tokens.typography.fontFamily.medium,
+                    backgroundColor: tokens.colors.tagBackground,
+                    borderRadius: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
                   },
                 ]}
               >
-                {job.seniorityLevel}
-              </Text>
-            </View>
-          )}
-          {job.jobType && (
-            <View
-              style={[
-                styles.tag,
-                {
-                  backgroundColor: tokens.colors.tagBackground,
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.tagText,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.sm,
-                    fontFamily: tokens.typography.fontFamily.medium,
-                  },
-                ]}
-              >
-                {job.jobType}
-              </Text>
-            </View>
-          )}
-
-          {job.mainCategory && (
-            <View
-              style={[
-                styles.tag,
-                {
-                  backgroundColor: tokens.colors.tagBackground,
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.tagText,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.sm,
-                    fontFamily: tokens.typography.fontFamily.medium,
-                  },
-                ]}
-              >
-                {job.mainCategory}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Action Buttons */}
-        <View style={[styles.actionsRow, { marginTop: 20 }]}>
-          {/* Save Button */}
-          <Pressable
-            onPress={(e) => {
-              e.stopPropagation();
-              handleSavePress();
-            }}
-            style={[
-              styles.saveButton,
-              {
-                borderWidth: 2,
-                borderColor: isSaved
-                  ? tokens.colors.savedJob
-                  : tokens.colors.primary,
-                borderRadius: 10,
-                backgroundColor: isSaved
-                  ? tokens.colors.savedJob
-                  : tokens.colors.cardBackground,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.saveButtonText,
-                {
-                  color: isSaved
-                    ? tokens.colors.buttonText
-                    : tokens.colors.primary,
-                  fontFamily: tokens.typography.fontFamily.semibold,
-                },
-              ]}
-            >
-              {isSaved ? "Saved" : "Save Job"}
-            </Text>
-          </Pressable>
-
-          {/* Apply Button */}
-          <Pressable
-            onPress={(e) => {
-              e.stopPropagation();
-              if (!isApplied) {
-                onApplyPress();
-              }
-            }}
-            disabled={isApplied}
-            style={[
-              styles.applyButton,
-              {
-                backgroundColor: isApplied
-                  ? tokens.colors.backgroundSecondary
-                  : tokens.colors.primary,
-                borderRadius: 10,
-                opacity: isApplied ? 0.8 : 1,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.applyButtonText,
-                {
-                  color: isApplied
-                    ? tokens.colors.textSecondary
-                    : tokens.colors.buttonText,
-                  fontFamily: tokens.typography.fontFamily.semibold,
-                },
-              ]}
-            >
-              {isApplied ? "Applied" : "Apply"}
-            </Text>
-          </Pressable>
+                <Text
+                  style={[
+                    styles.tagText,
+                    {
+                      color: tokens.colors.text,
+                      fontSize: tokens.typography.sizes.sm,
+                      fontFamily: tokens.typography.fontFamily.medium,
+                    },
+                  ]}
+                >
+                  {tag}
+                </Text>
+              </View>
+            )
+          ))}
         </View>
       </Pressable>
+
+      {/* SECTION 2: Separate View for buttons so they don't trigger the card's onPress */}
+      <View style={[styles.actionsRow, { marginTop: 20 }]}>
+        <Pressable
+          onPress={handleSavePress}
+          style={[
+            styles.saveButton,
+            {
+              borderWidth: 2,
+              borderColor: isSaved ? tokens.colors.savedJob : tokens.colors.primary,
+              borderRadius: 10,
+              backgroundColor: isSaved ? tokens.colors.savedJob : tokens.colors.cardBackground,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.saveButtonText,
+              {
+                color: isSaved ? tokens.colors.buttonText : tokens.colors.primary,
+                fontFamily: tokens.typography.fontFamily.semibold,
+              },
+            ]}
+          >
+            {isSaved ? "Saved" : "Save Job"}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          onPress={onApplyPress}
+          disabled={isApplied}
+          style={[
+            styles.applyButton,
+            {
+              backgroundColor: isApplied
+                ? tokens.colors.backgroundSecondary
+                : tokens.colors.primary,
+              borderRadius: 10,
+              opacity: isApplied ? 0.8 : 1,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.applyButtonText,
+              {
+                color: isApplied
+                  ? tokens.colors.textSecondary
+                  : tokens.colors.buttonText,
+                fontFamily: tokens.typography.fontFamily.semibold,
+              },
+            ]}
+          >
+            {isApplied ? "Applied" : "Apply"}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -356,19 +283,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
-  },
-  logo: {
     width: 60,
     height: 60,
+  },
+  logo: {
+    width: "100%",
+    height: "100%",
   },
   logoPlaceholder: {
     textAlign: "center",
     fontSize: 11,
-    lineHeight: 14,
   },
   titleContainer: {
     flex: 1,
-    justifyContent: "center",
   },
   title: {
     lineHeight: 26,
@@ -389,7 +316,6 @@ const styles = StyleSheet.create({
   },
   infoText: {
     lineHeight: 20,
-    flexShrink: 1,
   },
   salaryRow: {
     flexDirection: "row",
@@ -411,27 +337,20 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "stretch",
     gap: 12,
   },
   saveButton: {
     flex: 1,
     paddingVertical: 14,
-    paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
   },
-  saveButtonText: {
-    lineHeight: 20,
-  },
+  saveButtonText: {},
   applyButton: {
     flex: 1,
     paddingVertical: 14,
-    paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
   },
-  applyButtonText: {
-    lineHeight: 20,
-  },
+  applyButtonText: {},
 });
