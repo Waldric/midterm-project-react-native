@@ -148,7 +148,7 @@ export const JobsHomeScreen: React.FC = () => {
               style={[
                 styles.savedButtonText,
                 {
-                  color: tokens.colors.background,
+                  color: tokens.colors.buttonText,
                   fontSize: tokens.typography.sizes.md,
                   fontFamily: tokens.typography.fontFamily.semibold,
                 },

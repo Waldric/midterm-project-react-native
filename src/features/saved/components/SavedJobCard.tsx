@@ -56,7 +56,7 @@ export const SavedJobCard: React.FC<SavedJobCardProps> = ({
       ]}
     >
       <Pressable onPress={onPress}>
-        {/* Header: Logo + Title + Company */}
+        {/* Header: Logo, Title, and Company */}
         <View style={styles.header}>
           {/* Company Logo */}
           <View
@@ -71,7 +71,7 @@ export const SavedJobCard: React.FC<SavedJobCardProps> = ({
             {job.companyLogoUrl ? (
               <Image
                 source={{ uri: job.companyLogoUrl }}
-                style={styles.logo}
+                style={[styles.logo, { borderRadius: tokens.borderRadius.md }]}
                 resizeMode="contain"
               />
             ) : (
@@ -345,8 +345,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   logoContainer: {
-    width: 72,
-    height: 72,
+    width: 60,
+    height: 60,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,

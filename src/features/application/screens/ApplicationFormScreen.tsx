@@ -129,7 +129,7 @@ export const ApplicationFormScreen: React.FC<Props> = ({
                     value={values.name}
                     onChangeText={handleChange("name")}
                     onBlur={handleBlur("name")}
-                    placeholder="Enter your full name"
+                    placeholder="Enter your name"
                     error={errors.name}
                     touched={touched.name}
                   />

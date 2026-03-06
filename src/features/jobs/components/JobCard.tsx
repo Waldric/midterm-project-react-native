@@ -40,8 +40,7 @@ export const JobCard: React.FC<JobCardProps> = ({
   };
 
   return (
-    <Pressable
-      onPress={onPress}
+    <View
       style={[
         styles.card,
         {
@@ -52,100 +51,121 @@ export const JobCard: React.FC<JobCardProps> = ({
         },
       ]}
     >
-      {/* Header: Logo + Title + Company */}
-      <View style={styles.header}>
-        {/* Company Logo */}
-        <View
-          style={[
-            styles.logoContainer,
-            {
-              backgroundColor: tokens.colors.backgroundSecondary,
-              borderRadius: 12,
-            },
-          ]}
-        >
-          {job.companyLogoUrl ? (
-            <Image
-              source={{ uri: job.companyLogoUrl }}
-              style={[styles.logo, { borderRadius: tokens.borderRadius.md }]}
-              resizeMode="contain"
-            />
-          ) : (
+      <Pressable onPress={onPress}>
+        {/* Header: Logo + Title + Company */}
+        <View style={styles.header}>
+          {/* Company Logo */}
+          <View
+            style={[
+              styles.logoContainer,
+              {
+                backgroundColor: tokens.colors.backgroundSecondary,
+                borderRadius: 12,
+              },
+            ]}
+          >
+            {job.companyLogoUrl ? (
+              <Image
+                source={{ uri: job.companyLogoUrl }}
+                style={[styles.logo, { borderRadius: tokens.borderRadius.md }]}
+                resizeMode="contain"
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.logoPlaceholder,
+                  {
+                    color: tokens.colors.textSecondary,
+                    fontFamily: tokens.typography.fontFamily.medium,
+                  },
+                ]}
+              >
+                {job.company.substring(0, 2).toUpperCase()}
+              </Text>
+            )}
+          </View>
+
+          {/* Title and Company */}
+          <View style={styles.titleContainer}>
             <Text
               style={[
-                styles.logoPlaceholder,
+                styles.title,
                 {
-                  color: tokens.colors.textSecondary,
-                  fontFamily: tokens.typography.fontFamily.medium,
+                  color: tokens.colors.text,
+                  fontSize: tokens.typography.sizes.lg,
+                  fontFamily: tokens.typography.fontFamily.bold,
                 },
               ]}
+              numberOfLines={2}
             >
-              {job.company.substring(0, 2).toUpperCase()}
+              {job.title}
             </Text>
-          )}
-        </View>
-
-        {/* Title and Company */}
-        <View style={styles.titleContainer}>
-          <Text
-            style={[
-              styles.title,
-              {
-                color: tokens.colors.text,
-                fontSize: tokens.typography.sizes.lg,
-                fontFamily: tokens.typography.fontFamily.bold,
-              },
-            ]}
-            numberOfLines={2}
-          >
-            {job.title}
-          </Text>
-          <Text
-            style={[
-              styles.company,
-              {
-                color: tokens.colors.textSecondary,
-                fontSize: tokens.typography.sizes.md,
-                fontFamily: tokens.typography.fontFamily.regular,
-                marginTop: 4,
-              },
-            ]}
-            numberOfLines={1}
-          >
-            {job.company}
-          </Text>
-        </View>
-      </View>
-
-      {/* Location and Work Model Row */}
-      <View style={[styles.infoRow, { marginTop: 16 }]}>
-        {/* Location */}
-        {job.location && (
-          <View style={styles.infoItem}>
-            <MapPinIcon size={18} color={tokens.colors.error} />
             <Text
               style={[
-                styles.infoText,
+                styles.company,
                 {
                   color: tokens.colors.textSecondary,
                   fontSize: tokens.typography.sizes.md,
                   fontFamily: tokens.typography.fontFamily.regular,
+                  marginTop: 4,
                 },
               ]}
               numberOfLines={1}
             >
-              {job.location}
+              {job.company}
             </Text>
           </View>
-        )}
+        </View>
 
-        {/* Work Model */}
-        {job.workModel && (
-          <View style={styles.infoItem}>
-            <BriefcaseIcon size={18} color={tokens.colors.text} />
+        {/* Location and Work Model Row */}
+        <View style={[styles.infoRow, { marginTop: 16 }]}>
+          {/* Location */}
+          {job.location && (
+            <View style={styles.infoItem}>
+              <MapPinIcon size={18} color={tokens.colors.error} />
+              <Text
+                style={[
+                  styles.infoText,
+                  {
+                    color: tokens.colors.textSecondary,
+                    fontSize: tokens.typography.sizes.md,
+                    fontFamily: tokens.typography.fontFamily.regular,
+                  },
+                ]}
+                numberOfLines={1}
+              >
+                {job.location}
+              </Text>
+            </View>
+          )}
+
+          {/* Work Model */}
+          {job.workModel && (
+            <View style={styles.infoItem}>
+              <BriefcaseIcon size={18} color={tokens.colors.text} />
+              <Text
+                style={[
+                  styles.infoText,
+                  {
+                    color: tokens.colors.textSecondary,
+                    fontSize: tokens.typography.sizes.md,
+                    fontFamily: tokens.typography.fontFamily.regular,
+                  },
+                ]}
+              >
+                {job.workModel}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Salary Range */}
+        {job.salaryRange && job.salaryRange !== "Competitive" && (
+          <View style={[styles.salaryRow, { marginTop: 12 }]}>
+            <CurrencyDollarIcon size={18} color={tokens.colors.warning} />
             <Text
               style={[
-                styles.infoText,
+                styles.salaryText,
                 {
                   color: tokens.colors.textSecondary,
                   fontSize: tokens.typography.sizes.md,
@@ -153,179 +173,168 @@ export const JobCard: React.FC<JobCardProps> = ({
                 },
               ]}
             >
-              {job.workModel}
+              {job.salaryRange}
             </Text>
           </View>
         )}
-      </View>
 
-      {/* Salary Range */}
-      {job.salaryRange && job.salaryRange !== "Competitive" && (
-        <View style={[styles.salaryRow, { marginTop: 12 }]}>
-          <CurrencyDollarIcon size={18} color={tokens.colors.warning} />
-          <Text
-            style={[
-              styles.salaryText,
-              {
-                color: tokens.colors.textSecondary,
-                fontSize: tokens.typography.sizes.md,
-                fontFamily: tokens.typography.fontFamily.regular,
-              },
-            ]}
-          >
-            {job.salaryRange}
-          </Text>
+        {/* Tags Row (Seniority, Job Type, Category) */}
+        <View style={[styles.tagsRow, { marginTop: 16 }]}>
+          {job.seniorityLevel && (
+            <View
+              style={[
+                styles.tag,
+                {
+                  backgroundColor: tokens.colors.tagBackground,
+                  borderRadius: 8,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.tagText,
+                  {
+                    color: tokens.colors.text,
+                    fontSize: tokens.typography.sizes.sm,
+                    fontFamily: tokens.typography.fontFamily.medium,
+                  },
+                ]}
+              >
+                {job.seniorityLevel}
+              </Text>
+            </View>
+          )}
+          {job.jobType && (
+            <View
+              style={[
+                styles.tag,
+                {
+                  backgroundColor: tokens.colors.tagBackground,
+                  borderRadius: 8,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.tagText,
+                  {
+                    color: tokens.colors.text,
+                    fontSize: tokens.typography.sizes.sm,
+                    fontFamily: tokens.typography.fontFamily.medium,
+                  },
+                ]}
+              >
+                {job.jobType}
+              </Text>
+            </View>
+          )}
+
+          {job.mainCategory && (
+            <View
+              style={[
+                styles.tag,
+                {
+                  backgroundColor: tokens.colors.tagBackground,
+                  borderRadius: 8,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.tagText,
+                  {
+                    color: tokens.colors.text,
+                    fontSize: tokens.typography.sizes.sm,
+                    fontFamily: tokens.typography.fontFamily.medium,
+                  },
+                ]}
+              >
+                {job.mainCategory}
+              </Text>
+            </View>
+          )}
         </View>
-      )}
 
-      {/* Tags Row (Seniority, Job Type, Category) */}
-      <View style={[styles.tagsRow, { marginTop: 16 }]}>
-        {job.seniorityLevel && (
-          <View
+        {/* Action Buttons */}
+        <View style={[styles.actionsRow, { marginTop: 20 }]}>
+          {/* Save Button */}
+          <Pressable
+            onPress={(e) => {
+              e.stopPropagation();
+              handleSavePress();
+            }}
             style={[
-              styles.tag,
+              styles.saveButton,
               {
-                backgroundColor: tokens.colors.tagBackground,
-                borderRadius: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tagText,
-                {
-                  color: tokens.colors.text,
-                  fontSize: tokens.typography.sizes.sm,
-                  fontFamily: tokens.typography.fontFamily.medium,
-                },
-              ]}
-            >
-              {job.seniorityLevel}
-            </Text>
-          </View>
-        )}
-
-        {job.jobType && (
-          <View
-            style={[
-              styles.tag,
-              {
-                backgroundColor: tokens.colors.tagBackground,
-                borderRadius: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tagText,
-                {
-                  color: tokens.colors.text,
-                  fontSize: tokens.typography.sizes.sm,
-                  fontFamily: tokens.typography.fontFamily.medium,
-                },
-              ]}
-            >
-              {job.jobType}
-            </Text>
-          </View>
-        )}
-
-        {job.mainCategory && (
-          <View
-            style={[
-              styles.tag,
-              {
-                backgroundColor: tokens.colors.tagBackground,
-                borderRadius: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tagText,
-                {
-                  color: tokens.colors.text,
-                  fontSize: tokens.typography.sizes.sm,
-                  fontFamily: tokens.typography.fontFamily.medium,
-                },
-              ]}
-            >
-              {job.mainCategory}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {/* Action Buttons */}
-      <View style={[styles.actionsRow, { marginTop: 20 }]}>
-        {/* Save Button */}
-        <Pressable
-          onPress={handleSavePress}
-          style={[
-            styles.saveButton,
-            {
-              borderWidth: 2,
-              borderColor: isSaved
-                ? tokens.colors.savedJob
-                : tokens.colors.primary,
-              borderRadius: 10,
-              backgroundColor: isSaved
-                ? tokens.colors.savedJob
-                : tokens.colors.cardBackground,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.saveButtonText,
-              {
-                color: isSaved
-                  ? tokens.colors.buttonText
+                borderWidth: 2,
+                borderColor: isSaved
+                  ? tokens.colors.savedJob
                   : tokens.colors.primary,
-                fontFamily: tokens.typography.fontFamily.semibold,
+                borderRadius: 10,
+                backgroundColor: isSaved
+                  ? tokens.colors.savedJob
+                  : tokens.colors.cardBackground,
               },
             ]}
           >
-            {isSaved ? "Saved" : "Save Job"}
-          </Text>
-        </Pressable>
+            <Text
+              style={[
+                styles.saveButtonText,
+                {
+                  color: isSaved
+                    ? tokens.colors.buttonText
+                    : tokens.colors.primary,
+                  fontFamily: tokens.typography.fontFamily.semibold,
+                },
+              ]}
+            >
+              {isSaved ? "Saved" : "Save Job"}
+            </Text>
+          </Pressable>
 
-        <Pressable
-          onPress={onApplyPress}
-          disabled={isApplied}
-          style={[
-            styles.applyButton,
-            {
-              backgroundColor: isApplied
-                ? tokens.colors.backgroundSecondary
-                : tokens.colors.primary,
-              borderRadius: 10,
-              opacity: isApplied ? 0.8 : 1,
-            },
-          ]}
-        >
-          <Text
+          {/* Apply Button */}
+          <Pressable
+            onPress={(e) => {
+              e.stopPropagation();
+              if (!isApplied) {
+                onApplyPress();
+              }
+            }}
+            disabled={isApplied}
             style={[
-              styles.applyButtonText,
+              styles.applyButton,
               {
-                color: isApplied
-                  ? tokens.colors.textSecondary
-                  : tokens.colors.buttonText,
-                fontFamily: tokens.typography.fontFamily.semibold,
+                backgroundColor: isApplied
+                  ? tokens.colors.backgroundSecondary
+                  : tokens.colors.primary,
+                borderRadius: 10,
+                opacity: isApplied ? 0.8 : 1,
               },
             ]}
           >
-            {isApplied ? "Applied" : "Apply"}
-          </Text>
-        </Pressable>
-      </View>
-    </Pressable>
+            <Text
+              style={[
+                styles.applyButtonText,
+                {
+                  color: isApplied
+                    ? tokens.colors.textSecondary
+                    : tokens.colors.buttonText,
+                  fontFamily: tokens.typography.fontFamily.semibold,
+                },
+              ]}
+            >
+              {isApplied ? "Applied" : "Apply"}
+            </Text>
+          </Pressable>
+        </View>
+      </Pressable>
+    </View>
   );
 };
 

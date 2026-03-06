@@ -17,14 +17,14 @@ const lightColors = {
   buttonText: "#FFFFFF",
   cardStroke: "#DEDEDE",
   tagBackground: "#f0f0f0",
-  savedJob: "rgba(6, 67, 96, 0.29)",
+  savedJob: "rgba(12, 44, 99, 0.29)",
 };
 
 const darkColors = {
   background: "#0F172A",
-  backgroundSecondary: "#1E293B",
+  backgroundSecondary: "#4f5a6b",
   surface: "#1E293B",
-  primary: "#4189bc",
+  primary: "#1270b3",
   secondary: "#94A3B8",
   text: "#F1F5F9",
   textSecondary: "#94A3B8",
@@ -37,7 +37,7 @@ const darkColors = {
   buttonText: "#FFFFFF",
   cardStroke: "#4B5563",
   tagBackground: "#374151",
-  savedJob: "rgba(45, 212, 190, 0.17)",
+  savedJob: "rgba(138, 148, 197, 0.17)",
 };
 
 const spacing = {
