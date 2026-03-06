@@ -1,9 +1,14 @@
-import React from 'react';
-import { FlatList, StyleSheet, View, ActivityIndicator } from 'react-native';
-import { Job } from '../types/job.types';
-import { JobCard } from './JobCard';
-import { EmptyState } from '../../../shared/components/EmptyState';
-import { useTheme } from '../../../shared/theme/useTheme';
+import React from "react";
+import {
+  FlatList,
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import { JobCard } from "./JobCard";
+import { Job } from "../types/job.types";
+import { useTheme } from "../../../shared/theme/useTheme";
 
 interface JobListProps {
   jobs: Job[];
@@ -11,10 +16,10 @@ interface JobListProps {
   onJobPress: (job: Job) => void;
   onSavePress: (jobId: string) => void;
   onApplyPress: (job: Job) => void;
+  isJobApplied: (jobId: string) => boolean;
   isLoading?: boolean;
   emptyTitle?: string;
   emptyMessage?: string;
-  showSaveButton?: boolean;
 }
 
 export const JobList: React.FC<JobListProps> = ({
@@ -23,23 +28,62 @@ export const JobList: React.FC<JobListProps> = ({
   onJobPress,
   onSavePress,
   onApplyPress,
+  isJobApplied,
   isLoading = false,
-  emptyTitle = 'No Jobs Found',
-  emptyMessage = 'Try adjusting your search criteria',
-  showSaveButton = true,
+  emptyTitle = "No Jobs Available",
+  emptyMessage = "Check back later for new opportunities",
 }) => {
   const { tokens } = useTheme();
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={tokens.colors.primary} />
+        <Text
+          style={[
+            styles.loadingText,
+            {
+              color: tokens.colors.textSecondary,
+              fontSize: tokens.typography.sizes.md,
+              marginTop: tokens.spacing.md,
+            },
+          ]}
+        >
+          Loading jobs...
+        </Text>
       </View>
     );
   }
 
   if (jobs.length === 0) {
-    return <EmptyState title={emptyTitle} message={emptyMessage} icon="🔍" />;
+    return (
+      <View style={styles.centerContainer}>
+        <Text
+          style={[
+            styles.emptyTitle,
+            {
+              color: tokens.colors.text,
+              fontSize: tokens.typography.sizes.xl,
+              fontFamily: tokens.typography.fontFamily.semibold,
+            },
+          ]}
+        >
+          {emptyTitle}
+        </Text>
+        <Text
+          style={[
+            styles.emptyMessage,
+            {
+              color: tokens.colors.textSecondary,
+              fontSize: tokens.typography.sizes.md,
+              marginTop: tokens.spacing.sm,
+            },
+          ]}
+        >
+          {emptyMessage}
+        </Text>
+      </View>
+    );
   }
 
   return (
@@ -49,27 +93,41 @@ export const JobList: React.FC<JobListProps> = ({
         <JobCard
           job={item}
           isSaved={savedJobIds.includes(item.id)}
+          isApplied={isJobApplied(item.id)}
           onPress={() => onJobPress(item)}
           onSavePress={() => onSavePress(item.id)}
           onApplyPress={() => onApplyPress(item)}
-          showSaveButton={showSaveButton}
         />
       )}
-      keyExtractor={item => item.id}
-      contentContainerStyle={styles.listContent}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={[
+        styles.listContent,
+        {
+          padding: tokens.spacing.lg,
+        },
+      ]}
       showsVerticalScrollIndicator={false}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
+  centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  loadingText: {
+    textAlign: "center",
+  },
+  emptyTitle: {
+    textAlign: "center",
+  },
+  emptyMessage: {
+    textAlign: "center",
   },
   listContent: {
-    padding: 16,
     paddingBottom: 32,
   },
 });

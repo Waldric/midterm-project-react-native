@@ -1,156 +1,99 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ScreenContainer } from '../../../shared/components/ScreenContainer';
-import { AppButton } from '../../../shared/components/AppButton';
-import { useTheme } from '../../../shared/theme/useTheme';
-import { RootStackParamList, ROUTES } from '../../../app/navigation/routes';
-import { ApplicationFormData, ApplicationFormErrors } from '../types/application.types';
-import { validateApplicationForm, hasErrors } from '../utils/validation';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Formik } from "formik";
+import { ScreenContainer } from "../../../shared/components/ScreenContainer";
+import { AppButton } from "../../../shared/components/AppButton";
+import { useTheme } from "../../../shared/theme/useTheme";
+import { RootStackParamList, ROUTES } from "../../../app/navigation/routes";
+import { ApplicationFormData } from "../types/application.types";
+import { validateApplicationForm } from "../utils/validation";
+import { useApp } from "../../../app/providers/AppProviders";
+import { FormField } from "../components/FormField";
+import { JobInfoCard } from "../components/JobInfoCard";
 
-type ApplicationFormScreenProps = NativeStackScreenProps<RootStackParamList, 'ApplicationForm'>;
+type Props = NativeStackScreenProps<RootStackParamList, "ApplicationForm">;
 
-export const ApplicationFormScreen: React.FC<ApplicationFormScreenProps> = ({ route, navigation }) => {
+export const ApplicationFormScreen: React.FC<Props> = ({
+  route,
+  navigation,
+}) => {
   const { job, fromSavedJobs } = route.params;
   const { tokens } = useTheme();
-  
-  const [formData, setFormData] = useState<ApplicationFormData>({
-    name: '',
-    email: '',
-    contactNumber: '',
-    whyHireYou: '',
-  });
+  const { applyToJob } = useApp();
 
-  const [errors, setErrors] = useState<ApplicationFormErrors>({});
-  const [touched, setTouched] = useState<Record<keyof ApplicationFormData, boolean>>({
-    name: false,
-    email: false,
-    contactNumber: false,
-    whyHireYou: false,
-  });
-
-  const handleInputChange = (field: keyof ApplicationFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (touched[field]) {
-      const newErrors = validateApplicationForm({ ...formData, [field]: value });
-      setErrors(newErrors);
-    }
+  const initialValues: ApplicationFormData = {
+    name: "",
+    email: "",
+    contactNumber: "",
+    whyHireYou: "",
   };
 
-  const handleBlur = (field: keyof ApplicationFormData) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-    const newErrors = validateApplicationForm(formData);
-    setErrors(newErrors);
-  };
-
-  const handleSubmit = () => {
-    const allTouched: Record<keyof ApplicationFormData, boolean> = {
-      name: true,
-      email: true,
-      contactNumber: true,
-      whyHireYou: true,
-    };
-    setTouched(allTouched);
-
-    const validationErrors = validateApplicationForm(formData);
-    setErrors(validationErrors);
-
-    if (hasErrors(validationErrors)) {
-      Alert.alert(
-        'Validation Error',
-        'Please fix all errors before submitting',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-
+  const handleSubmit = (values: ApplicationFormData, { resetForm }: any) => {
     Alert.alert(
-      'Application Submitted',
-      `Your application for ${job.title} at ${job.company} has been submitted successfully!`,
+      "Confirm Application",
+      `Are you sure you want to submit your application for ${job.title} at ${job.company}?\n\nPlease review your details:\n\n• Name: ${values.name}\n• Email: ${values.email}\n• Contact: ${values.contactNumber}`,
       [
         {
-          text: 'Okay',
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Submit",
+          style: "default",
           onPress: () => {
-            setFormData({
-              name: '',
-              email: '',
-              contactNumber: '',
-              whyHireYou: '',
-            });
-            setTouched({
-              name: false,
-              email: false,
-              contactNumber: false,
-              whyHireYou: false,
-            });
-            setErrors({});
-
-            if (fromSavedJobs) {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: ROUTES.JOBS_HOME }],
-              });
-            } else {
-              navigation.goBack();
-            }
+            applyToJob(job.id);
+            Alert.alert(
+              "Application Submitted",
+              `Your application for ${job.title} at ${job.company} has been submitted successfully!`,
+              [
+                {
+                  text: "OK",
+                  onPress: () => {
+                    resetForm();
+                    navigation.reset({
+                      index: 0,
+                      routes: [
+                        {
+                          name: fromSavedJobs
+                            ? ROUTES.JOBS_HOME
+                            : ROUTES.JOBS_HOME,
+                        },
+                      ],
+                    });
+                  },
+                },
+              ],
+              { cancelable: false },
+            );
           },
         },
       ],
-      { cancelable: false }
     );
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer noPaddingTop>
       <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
       >
         <ScrollView
-          style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={[styles.container, { padding: tokens.spacing.lg }]}>
-            <View
-              style={[
-                styles.jobInfo,
-                {
-                  backgroundColor: tokens.colors.cardBackground,
-                  borderRadius: tokens.borderRadius.lg,
-                  padding: tokens.spacing.md,
-                  borderWidth: 1,
-                  borderColor: tokens.colors.border,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.jobTitle,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.lg,
-                    fontWeight: tokens.typography.weights.semibold,
-                  },
-                ]}
-              >
-                {job.title}
-              </Text>
-              <Text
-                style={[
-                  styles.jobCompany,
-                  {
-                    color: tokens.colors.textSecondary,
-                    fontSize: tokens.typography.sizes.md,
-                    marginTop: tokens.spacing.xs,
-                  },
-                ]}
-              >
-                {job.company}
-              </Text>
-            </View>
+          <View style={{ padding: tokens.spacing.lg }}>
+            <JobInfoCard job={job} />
 
             <Text
               style={[
@@ -158,7 +101,7 @@ export const ApplicationFormScreen: React.FC<ApplicationFormScreenProps> = ({ ro
                 {
                   color: tokens.colors.text,
                   fontSize: tokens.typography.sizes.xl,
-                  fontWeight: tokens.typography.weights.bold,
+                  fontFamily: tokens.typography.fontFamily.bold,
                   marginTop: tokens.spacing.xl,
                   marginBottom: tokens.spacing.md,
                 },
@@ -167,206 +110,77 @@ export const ApplicationFormScreen: React.FC<ApplicationFormScreenProps> = ({ ro
               Application Form
             </Text>
 
-            <View style={[styles.field, { marginBottom: tokens.spacing.md }]}>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                    fontWeight: tokens.typography.weights.medium,
-                    marginBottom: tokens.spacing.xs,
-                  },
-                ]}
-              >
-                Name *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: tokens.colors.inputBackground,
-                    borderColor: errors.name && touched.name ? tokens.colors.error : tokens.colors.border,
-                    borderRadius: tokens.borderRadius.md,
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                  },
-                ]}
-                value={formData.name}
-                onChangeText={value => handleInputChange('name', value)}
-                onBlur={() => handleBlur('name')}
-                placeholder="Enter your full name"
-                placeholderTextColor={tokens.colors.textSecondary}
-              />
-              {errors.name && touched.name && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    {
-                      color: tokens.colors.error,
-                      fontSize: tokens.typography.sizes.sm,
-                      marginTop: tokens.spacing.xs,
-                    },
-                  ]}
-                >
-                  {errors.name}
-                </Text>
-              )}
-            </View>
+            <Formik
+              initialValues={initialValues}
+              validate={validateApplicationForm}
+              onSubmit={handleSubmit}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <>
+                  <FormField
+                    label="Name *"
+                    value={values.name}
+                    onChangeText={handleChange("name")}
+                    onBlur={handleBlur("name")}
+                    placeholder="Enter your full name"
+                    error={errors.name}
+                    touched={touched.name}
+                  />
 
-            <View style={[styles.field, { marginBottom: tokens.spacing.md }]}>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                    fontWeight: tokens.typography.weights.medium,
-                    marginBottom: tokens.spacing.xs,
-                  },
-                ]}
-              >
-                Email *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: tokens.colors.inputBackground,
-                    borderColor: errors.email && touched.email ? tokens.colors.error : tokens.colors.border,
-                    borderRadius: tokens.borderRadius.md,
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                  },
-                ]}
-                value={formData.email}
-                onChangeText={value => handleInputChange('email', value)}
-                onBlur={() => handleBlur('email')}
-                placeholder="Enter your email"
-                placeholderTextColor={tokens.colors.textSecondary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-              {errors.email && touched.email && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    {
-                      color: tokens.colors.error,
-                      fontSize: tokens.typography.sizes.sm,
-                      marginTop: tokens.spacing.xs,
-                    },
-                  ]}
-                >
-                  {errors.email}
-                </Text>
-              )}
-            </View>
+                  <FormField
+                    label="Email *"
+                    value={values.email}
+                    onChangeText={handleChange("email")}
+                    onBlur={handleBlur("email")}
+                    placeholder="Enter your email"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    error={errors.email}
+                    touched={touched.email}
+                  />
 
-            <View style={[styles.field, { marginBottom: tokens.spacing.md }]}>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                    fontWeight: tokens.typography.weights.medium,
-                    marginBottom: tokens.spacing.xs,
-                  },
-                ]}
-              >
-                Contact Number *
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: tokens.colors.inputBackground,
-                    borderColor: errors.contactNumber && touched.contactNumber ? tokens.colors.error : tokens.colors.border,
-                    borderRadius: tokens.borderRadius.md,
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                  },
-                ]}
-                value={formData.contactNumber}
-                onChangeText={value => handleInputChange('contactNumber', value)}
-                onBlur={() => handleBlur('contactNumber')}
-                placeholder="Enter your contact number"
-                placeholderTextColor={tokens.colors.textSecondary}
-                keyboardType="phone-pad"
-              />
-              {errors.contactNumber && touched.contactNumber && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    {
-                      color: tokens.colors.error,
-                      fontSize: tokens.typography.sizes.sm,
-                      marginTop: tokens.spacing.xs,
-                    },
-                  ]}
-                >
-                  {errors.contactNumber}
-                </Text>
-              )}
-            </View>
+                  <FormField
+                    label="Contact Number *"
+                    value={values.contactNumber}
+                    onChangeText={handleChange("contactNumber")}
+                    onBlur={handleBlur("contactNumber")}
+                    placeholder="Enter your contact number"
+                    keyboardType="phone-pad"
+                    error={errors.contactNumber}
+                    touched={touched.contactNumber}
+                  />
 
-            <View style={[styles.field, { marginBottom: tokens.spacing.xl }]}>
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                    fontWeight: tokens.typography.weights.medium,
-                    marginBottom: tokens.spacing.xs,
-                  },
-                ]}
-              >
-                Why should we hire you? *
-              </Text>
-              <TextInput
-                style={[
-                  styles.textArea,
-                  {
-                    backgroundColor: tokens.colors.inputBackground,
-                    borderColor: errors.whyHireYou && touched.whyHireYou ? tokens.colors.error : tokens.colors.border,
-                    borderRadius: tokens.borderRadius.md,
-                    color: tokens.colors.text,
-                    fontSize: tokens.typography.sizes.md,
-                  },
-                ]}
-                value={formData.whyHireYou}
-                onChangeText={value => handleInputChange('whyHireYou', value)}
-                onBlur={() => handleBlur('whyHireYou')}
-                placeholder="Tell us why you're the best fit for this position (minimum 20 characters)"
-                placeholderTextColor={tokens.colors.textSecondary}
-                multiline
-                numberOfLines={6}
-                textAlignVertical="top"
-              />
-              {errors.whyHireYou && touched.whyHireYou && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    {
-                      color: tokens.colors.error,
-                      fontSize: tokens.typography.sizes.sm,
-                      marginTop: tokens.spacing.xs,
-                    },
-                  ]}
-                >
-                  {errors.whyHireYou}
-                </Text>
-              )}
-            </View>
+                  <FormField
+                    label="Why should we hire you? *"
+                    value={values.whyHireYou}
+                    onChangeText={handleChange("whyHireYou")}
+                    onBlur={handleBlur("whyHireYou")}
+                    placeholder="Tell us why you're the best fit for this position"
+                    multiline
+                    numberOfLines={6}
+                    textAlignVertical="top"
+                    error={errors.whyHireYou}
+                    touched={touched.whyHireYou}
+                  />
 
-            <AppButton
-              title="Submit Application"
-              onPress={handleSubmit}
-              variant="primary"
-              size="large"
-            />
+                  <View style={{ marginTop: tokens.spacing.md }}>
+                    <AppButton
+                      title="Submit Application"
+                      onPress={handleSubmit}
+                      variant="primary"
+                      size="large"
+                    />
+                  </View>
+                </>
+              )}
+            </Formik>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -375,32 +189,10 @@ export const ApplicationFormScreen: React.FC<ApplicationFormScreenProps> = ({ ro
 };
 
 const styles = StyleSheet.create({
-  keyboardView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
+  flex: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 30,
   },
-  container: {},
-  jobInfo: {},
-  jobTitle: {},
-  jobCompany: {},
   formTitle: {},
-  field: {},
-  label: {},
-  input: {
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  textArea: {
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 120,
-  },
-  errorText: {},
 });

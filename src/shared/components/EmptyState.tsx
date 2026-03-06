@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '../theme/useTheme';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useTheme } from "../theme/useTheme";
 
 interface EmptyStateProps {
   title: string;
@@ -8,7 +8,11 @@ interface EmptyStateProps {
   icon?: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ title, message, icon = '📭' }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({
+  title,
+  message,
+  icon = "📭",
+}) => {
   const { tokens } = useTheme();
 
   return (
@@ -20,7 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ title, message, icon = '
           {
             color: tokens.colors.text,
             fontSize: tokens.typography.sizes.lg,
-            fontWeight: tokens.typography.weights.semibold,
+            fontFamily: tokens.typography.fontFamily.semibold,
           },
         ]}
       >
@@ -44,8 +48,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ title, message, icon = '
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 32,
   },
   icon: {
@@ -53,11 +57,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   message: {
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
   },
 });

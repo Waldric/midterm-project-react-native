@@ -1,35 +1,43 @@
-import { ThemeTokens } from './theme.types';
+import { ThemeTokens } from "./theme.types";
 
 const lightColors = {
-  background: '#FFFFFF',
-  surface: '#F5F5F5',
-  primary: '#2563EB',
-  secondary: '#64748B',
-  text: '#1E293B',
-  textSecondary: '#64748B',
-  border: '#E2E8F0',
-  error: '#DC2626',
-  success: '#10B981',
-  warning: '#F59E0B',
-  cardBackground: '#FFFFFF',
-  inputBackground: '#F8FAFC',
-  buttonText: '#FFFFFF',
+  background: "#FFFFFF",
+  backgroundSecondary: "#F5F5F5",
+  surface: "#F5F5F5",
+  primary: "#022658",
+  secondary: "#64748B",
+  text: "#1E293B",
+  textSecondary: "#64748B",
+  border: "#E2E8F0",
+  error: "#DC2626",
+  success: "#10B981",
+  warning: "#F59E0B",
+  cardBackground: "#FFFFFF",
+  inputBackground: "#F8FAFC",
+  buttonText: "#FFFFFF",
+  cardStroke: "#DEDEDE",
+  tagBackground: "#f0f0f0",
+  savedJob: "rgba(6, 67, 96, 0.29)",
 };
 
 const darkColors = {
-  background: '#0F172A',
-  surface: '#1E293B',
-  primary: '#3B82F6',
-  secondary: '#94A3B8',
-  text: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  border: '#334155',
-  error: '#EF4444',
-  success: '#22C55E',
-  warning: '#FBBF24',
-  cardBackground: '#1E293B',
-  inputBackground: '#334155',
-  buttonText: '#FFFFFF',
+  background: "#0F172A",
+  backgroundSecondary: "#1E293B",
+  surface: "#1E293B",
+  primary: "#4189bc",
+  secondary: "#94A3B8",
+  text: "#F1F5F9",
+  textSecondary: "#94A3B8",
+  border: "#334155",
+  error: "#EF4444",
+  success: "rgba(45, 212, 191, 0.1)",
+  warning: "#FBBF24",
+  cardBackground: "#1E293B",
+  inputBackground: "#334155",
+  buttonText: "#FFFFFF",
+  cardStroke: "#4B5563",
+  tagBackground: "#374151",
+  savedJob: "rgba(45, 212, 190, 0.17)",
 };
 
 const spacing = {
@@ -48,7 +56,15 @@ const borderRadius = {
   full: 9999,
 };
 
+const fontFamily = {
+  regular: "Inter_400Regular",
+  medium: "Inter_500Medium",
+  semibold: "Inter_600SemiBold",
+  bold: "Inter_700Bold",
+};
+
 const typography = {
+  fontFamily,
   sizes: {
     xs: 12,
     sm: 14,
@@ -56,12 +72,6 @@ const typography = {
     lg: 18,
     xl: 24,
     xxl: 32,
-  },
-  weights: {
-    normal: '400' as const,
-    medium: '500' as const,
-    semibold: '600' as const,
-    bold: '700' as const,
   },
 };
 

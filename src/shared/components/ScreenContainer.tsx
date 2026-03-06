@@ -1,22 +1,34 @@
-import React, { ReactNode } from 'react';
-import { View, StyleSheet, ViewStyle, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '../theme/useTheme';
+import React, { ReactNode } from "react";
+import {
+  View,
+  StyleSheet,
+  ViewStyle,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../theme/useTheme";
 
 interface ScreenContainerProps {
   children: ReactNode;
   scrollable?: boolean;
   keyboardAware?: boolean;
   style?: ViewStyle;
+  noPaddingTop?: boolean;
 }
 
 export const ScreenContainer: React.FC<ScreenContainerProps> = ({
   children,
   scrollable = false,
   keyboardAware = false,
+  noPaddingTop = false,
   style,
 }) => {
   const { tokens } = useTheme();
+  const safeAreaEdges = noPaddingTop
+    ? ["left", "right"]
+    : ["top", "left", "right"];
 
   const content = (
     <View
@@ -32,11 +44,11 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   if (keyboardAware) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={safeAreaEdges as any}>
         <KeyboardAvoidingView
           style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
           {scrollable ? (
             <ScrollView
@@ -56,7 +68,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   if (scrollable) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={safeAreaEdges as any}>
         <ScrollView
           style={styles.flex}
           contentContainerStyle={styles.scrollContent}
@@ -68,7 +80,7 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={safeAreaEdges as any}>
       {content}
     </SafeAreaView>
   );

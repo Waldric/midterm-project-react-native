@@ -1,23 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
-import { ScreenContainer } from '../../../shared/components/ScreenContainer';
-import { SearchBar } from '../components/SearchBar';
-import { JobList } from '../components/JobList';
-import { useApp } from '../../../app/providers/AppProviders';
-import { useTheme } from '../../../shared/theme/useTheme';
-import { filterJobsBySearch } from '../utils/jobs.filters';
-import { Job } from '../types/job.types';
-import { RootStackParamList, ROUTES } from '../../../app/navigation/routes';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Pressable, Text, Switch } from "react-native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { ScreenContainer } from "../../../shared/components/ScreenContainer";
+import { SearchBar } from "../components/SearchBar";
+import { JobList } from "../components/JobList";
+import { useApp } from "../../../app/providers/AppProviders";
+import { useTheme } from "../../../shared/theme/useTheme";
+import { filterJobsBySearch } from "../utils/jobs.filters";
+import { Job } from "../types/job.types";
+import { RootStackParamList, ROUTES } from "../../../app/navigation/routes";
 
-type JobsHomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'JobsHome'>;
+type JobsHomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "JobsHome"
+>;
 
 export const JobsHomeScreen: React.FC = () => {
   const navigation = useNavigation<JobsHomeScreenNavigationProp>();
-  const { jobs, savedJobIds, isLoading, fetchJobsData, saveJob, toggleTheme, theme } = useApp();
+
+  const {
+    jobs,
+    savedJobIds,
+    isLoading,
+    fetchJobsData,
+    saveJob,
+    removeJob,
+    isJobSaved,
+    appliedJobIds,
+    toggleTheme,
+    theme,
+  } = useApp();
+
   const { tokens } = useTheme();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchJobsData();
@@ -30,11 +46,19 @@ export const JobsHomeScreen: React.FC = () => {
   };
 
   const handleSavePress = (jobId: string) => {
-    saveJob(jobId);
+    if (isJobSaved(jobId)) {
+      removeJob(jobId);
+    } else {
+      saveJob(jobId);
+    }
   };
 
   const handleApplyPress = (job: Job) => {
     navigation.navigate(ROUTES.APPLICATION_FORM, { job, fromSavedJobs: false });
+  };
+
+  const isJobApplied = (jobId: string): boolean => {
+    return appliedJobIds?.includes(jobId) ?? false;
   };
 
   const handleSavedJobsPress = () => {
@@ -43,50 +67,142 @@ export const JobsHomeScreen: React.FC = () => {
 
   return (
     <ScreenContainer keyboardAware>
-      <View style={[styles.header, { backgroundColor: tokens.colors.background }]}>
+      <View
+        style={[styles.header, { backgroundColor: tokens.colors.background }]}
+      >
+        {/* Header Top with Title and Theme Toggle */}
         <View style={styles.headerTop}>
-          <Text
+          <View style={styles.titleContainer}>
+            <Text
+              style={[
+                styles.headerSubtitle,
+                {
+                  color: tokens.colors.textSecondary,
+                  fontSize: tokens.typography.sizes.md,
+                  fontFamily: tokens.typography.fontFamily.regular,
+                },
+              ]}
+            >
+              Find a job with
+            </Text>
+            <Text
+              style={[
+                styles.headerTitle,
+                {
+                  color: tokens.colors.text,
+                  fontSize: 48,
+                  fontFamily: tokens.typography.fontFamily.bold,
+                  marginTop: 1,
+                },
+              ]}
+            >
+              JobNode.
+            </Text>
+          </View>
+
+          {/* Theme Toggle */}
+          <View style={styles.themeToggleContainer}>
+            <Switch
+              value={theme === "dark"}
+              onValueChange={toggleTheme}
+              trackColor={{
+                false: tokens.colors.border,
+                true: tokens.colors.primary,
+              }}
+              thumbColor={tokens.colors.surface}
+              ios_backgroundColor={tokens.colors.border}
+            />
+            <Text
+              style={[
+                styles.themeLabel,
+                {
+                  color: tokens.colors.textSecondary,
+                  fontSize: tokens.typography.sizes.sm,
+                  fontFamily: tokens.typography.fontFamily.regular,
+                  marginTop: 4,
+                },
+              ]}
+            >
+              {theme === "light" ? "Light Mode" : "Dark Mode"}
+            </Text>
+          </View>
+        </View>
+
+        {/* Search Bar and Saved Jobs Button */}
+        <View style={[styles.searchRow, { marginTop: tokens.spacing.lg }]}>
+          <View style={styles.searchBarContainer}>
+            <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
+          </View>
+
+          <Pressable
+            onPress={handleSavedJobsPress}
             style={[
-              styles.headerTitle,
+              styles.savedButton,
               {
-                color: tokens.colors.text,
-                fontSize: tokens.typography.sizes.xxl,
-                fontWeight: tokens.typography.weights.bold,
+                backgroundColor: tokens.colors.primary,
+                borderRadius: 10,
               },
             ]}
           >
-            Job Finder
-          </Text>
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              onPress={toggleTheme}
+            <Text
               style={[
-                styles.themeButton,
+                styles.savedButtonText,
                 {
-                  backgroundColor: tokens.colors.surface,
-                  borderRadius: tokens.borderRadius.md,
+                  color: tokens.colors.background,
+                  fontSize: tokens.typography.sizes.md,
+                  fontFamily: tokens.typography.fontFamily.semibold,
                 },
               ]}
             >
-              <Text style={styles.themeIcon}>{theme === 'light' ? '🌙' : '☀️'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleSavedJobsPress}
+              Saved Jobs
+            </Text>
+            {savedJobIds.length > 0 && (
+              <View
+                style={[
+                  styles.badge,
+                  {
+                    backgroundColor: tokens.colors.error,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.badgeText,
+                    {
+                      color: "#FFFFFF",
+                      fontSize: 12,
+                      fontFamily: tokens.typography.fontFamily.bold,
+                    },
+                  ]}
+                >
+                  {savedJobIds.length}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
+
+        {/* Job Count */}
+        {!isLoading && filteredJobs.length > 0 && (
+          <View
+            style={[styles.jobCountContainer, { marginTop: tokens.spacing.md }]}
+          >
+            <Text
               style={[
-                styles.savedButton,
+                styles.jobCount,
                 {
-                  backgroundColor: tokens.colors.primary,
-                  borderRadius: tokens.borderRadius.md,
+                  color: tokens.colors.textSecondary,
+                  fontSize: tokens.typography.sizes.sm,
+                  fontFamily: tokens.typography.fontFamily.regular,
                 },
               ]}
             >
-              <Text style={styles.savedButtonText}>💾 Saved ({savedJobIds.length})</Text>
-            </TouchableOpacity>
+              {searchQuery
+                ? `Found ${filteredJobs.length} ${filteredJobs.length === 1 ? "job" : "jobs"} matching "${searchQuery}"`
+                : `${filteredJobs.length} ${filteredJobs.length === 1 ? "job" : "jobs"} available`}
+            </Text>
           </View>
-        </View>
-        <View style={[styles.searchContainer, { marginTop: tokens.spacing.md }]}>
-          <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
-        </View>
+        )}
       </View>
 
       <JobList
@@ -95,12 +211,13 @@ export const JobsHomeScreen: React.FC = () => {
         onJobPress={handleJobPress}
         onSavePress={handleSavePress}
         onApplyPress={handleApplyPress}
+        isJobApplied={isJobApplied}
         isLoading={isLoading}
-        emptyTitle={searchQuery ? 'No Jobs Found' : 'No Jobs Available'}
+        emptyTitle={searchQuery ? "No Jobs Found" : "No Jobs Available"}
         emptyMessage={
           searchQuery
-            ? 'Try searching with different keywords'
-            : 'Check back later for new opportunities'
+            ? "Try searching with different keywords"
+            : "Check back later for new opportunities"
         }
       />
     </ScreenContainer>
@@ -109,39 +226,69 @@ export const JobsHomeScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
   },
   headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
-  headerTitle: {},
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
+  titleContainer: {
+    flex: 1,
   },
-  themeButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+  headerSubtitle: {
+    lineHeight: 22,
   },
-  themeIcon: {
-    fontSize: 20,
+  headerTitle: {
+    lineHeight: 56,
+    letterSpacing: -1,
+  },
+  themeToggleContainer: {
+    alignItems: "center",
+    paddingTop: 8,
+  },
+  themeLabel: {
+    textAlign: "center",
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  searchBarContainer: {
+    flex: 1,
+    marginRight: 12,
   },
   savedButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
   },
   savedButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
+    lineHeight: 20,
   },
-  searchContainer: {},
+  badge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    lineHeight: 16,
+  },
+  jobCountContainer: {
+    paddingHorizontal: 4,
+  },
+  jobCount: {
+    lineHeight: 18,
+  },
 });
